@@ -1,4 +1,4 @@
-package backend;
+package com.example.backend;
 
 import akka.actor.Extension;
 import com.typesafe.config.Config;

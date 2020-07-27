@@ -1,4 +1,4 @@
-package models.backend;
+package com.example.models.backend;
 
 /**
  * A point of interest, either a user position or a cluster of positions

@@ -1,12 +1,17 @@
-package backend;
+package com.example.backend;
 
-import akka.actor.*;
-import akka.contrib.pattern.DistributedPubSubExtension;
-import akka.contrib.pattern.DistributedPubSubMediator.Publish;
-import scala.concurrent.duration.Deadline;
-import models.backend.*;
-
+import akka.actor.ActorRef;
+import akka.actor.Cancellable;
+import akka.actor.Props;
+import akka.actor.UntypedAbstractActor;
+import akka.cluster.pubsub.DistributedPubSub;
+import akka.cluster.pubsub.DistributedPubSubMediator;
+import com.example.models.backend.BoundingBox;
+import com.example.models.backend.PointOfInterest;
+import com.example.models.backend.RegionId;
+import com.example.models.backend.RegionPoints;
 import play.libs.F.Tuple;
+import scala.concurrent.duration.Deadline;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -18,7 +23,7 @@ import java.util.stream.Collectors;
  * Summary regions receive region points from their 4 sub regions, cluster them, and publishes the resulting points
  * to subscribers of the topic with the region id.
  */
-public class SummaryRegion extends UntypedActor {
+public class SummaryRegion extends UntypedAbstractActor {
 
     public static Props props(RegionId regionId) {
         return Props.create(SummaryRegion.class, () -> new SummaryRegion(regionId));
@@ -26,7 +31,7 @@ public class SummaryRegion extends UntypedActor {
 
     private static final Object TICK = new Object();
 
-    private final ActorRef mediator = DistributedPubSubExtension.get(getContext().system()).mediator();
+    private final ActorRef mediator = DistributedPubSub.get(getContext().system()).mediator();
     private final SettingsImpl settings = Settings.SettingsProvider.get(getContext().system());
 
     private final RegionId regionId;
@@ -75,7 +80,7 @@ public class SummaryRegion extends UntypedActor {
             getContext().parent().tell(points, self());
 
             // publish total count to subscribers
-            mediator.tell(new Publish(regionId.getName(), points), self());
+            mediator.tell(new DistributedPubSubMediator.Publish(regionId.getName(), points), self());
 
             // stop the actor when no active sub-regions
             if (activePoints.isEmpty()) {

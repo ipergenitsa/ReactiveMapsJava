@@ -1,4 +1,4 @@
-package models.backend;
+package com.example.models.backend;
 
 /**
  * A bounding box

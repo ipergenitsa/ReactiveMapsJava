@@ -1,4 +1,4 @@
-@(content: Html)
+@(request: play.mvc.Http.Request)(content: Html)
 
 <!DOCTYPE html>
 
@@ -8,7 +8,7 @@
 
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
 
-        <meta name="websocketurl" content="@routes.Application.stream("").webSocketURL()"/>
+        <meta name="websocketurl" content="@routes.Application.stream("").webSocketURL(request)"/>
 
         <link rel="stylesheet" media="screen" href="@routes.Assets.at("lib/bootstrap/css/bootstrap.css")"/>
         <link rel="stylesheet" media="screen" href="@routes.Assets.at("lib/bootstrap/css/bootstrap-theme.css")"/>

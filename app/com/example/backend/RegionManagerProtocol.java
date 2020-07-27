@@ -1,9 +1,9 @@
-package backend;
+package com.example.backend;
 
 import akka.routing.ConsistentHashingRouter.ConsistentHashable;
-import models.backend.PointOfInterest;
-import models.backend.RegionId;
-import models.backend.RegionPoints;
+import com.example.models.backend.PointOfInterest;
+import com.example.models.backend.RegionId;
+import com.example.models.backend.RegionPoints;
 
 public abstract class RegionManagerProtocol {
 

@@ -1,10 +1,13 @@
-package backend;
+package com.example.backend;
 
-import akka.actor.*;
+import akka.actor.ActorRef;
+import akka.actor.Props;
+import akka.actor.UntypedAbstractActor;
 import akka.routing.FromConfig;
-import backend.RegionManagerProtocol.*;
-import models.backend.RegionId;
-import models.backend.RegionPoints;
+import com.example.backend.RegionManagerProtocol.UpdateRegionPoints;
+import com.example.backend.RegionManagerProtocol.UpdateUserPosition;
+import com.example.models.backend.RegionId;
+import com.example.models.backend.RegionPoints;
 import scala.Option;
 
 import java.util.function.Function;
@@ -14,7 +17,7 @@ import java.util.function.Function;
  * It also routes the `RegionPoints` from child `Region` or `SummaryRegion` to the node
  * responsible for the target region.
  */
-public class RegionManager extends UntypedActor {
+public class RegionManager extends UntypedAbstractActor {
 
     public static Props props() {
         return Props.create(RegionManager.class, RegionManager::new);

@@ -1,22 +1,26 @@
-package actors;
+package com.example.actors;
 
-import akka.actor.*;
-import akka.contrib.pattern.DistributedPubSubExtension;
-import akka.contrib.pattern.DistributedPubSubMediator.Subscribe;
-import akka.contrib.pattern.DistributedPubSubMediator.Unsubscribe;
-import backend.SettingsImpl;
+import akka.actor.ActorRef;
+import akka.actor.Cancellable;
+import akka.actor.Props;
+import akka.actor.UntypedAbstractActor;
+import akka.cluster.pubsub.DistributedPubSub;
+import akka.cluster.pubsub.DistributedPubSubMediator;
+import com.example.backend.Settings;
+import com.example.backend.SettingsImpl;
+import com.example.models.backend.BoundingBox;
+import com.example.models.backend.PointOfInterest;
+import com.example.models.backend.PointOfInterest.UserPosition;
+import com.example.models.backend.RegionId;
+import com.example.models.backend.RegionPoints;
 import com.google.common.collect.ImmutableSet;
-import models.backend.*;
-import models.backend.PointOfInterest.UserPosition;
-import backend.Settings;
-import actors.PositionSubscriberProtocol.*;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-public class PositionSubscriber extends UntypedActor {
+public class PositionSubscriber extends UntypedAbstractActor {
 
     public static Props props(ActorRef subscriber) {
         return Props.create(PositionSubscriber.class, () -> new PositionSubscriber(subscriber));
@@ -24,7 +28,7 @@ public class PositionSubscriber extends UntypedActor {
 
     private final ActorRef subscriber;
 
-    private final ActorRef mediator = DistributedPubSubExtension.get(getContext().system()).mediator();
+    private final ActorRef mediator = DistributedPubSub.get(getContext().system()).mediator();
     private final SettingsImpl settings = Settings.SettingsProvider.get(getContext().system());
 
     public PositionSubscriber(ActorRef subscriber) {
@@ -64,12 +68,12 @@ public class PositionSubscriber extends UntypedActor {
 
             // Subscribe to any regions that we're not already subscribed to
             newRegions.stream().filter(r -> !regions.contains(r)).forEach(region ->
-                    mediator.tell(new Subscribe(region.getName(), self()), self())
+                    mediator.tell(new DistributedPubSubMediator.Subscribe(region.getName(), self()), self())
             );
 
             // Unsubscribe from any regions that we no longer should be subscribed to
             regions.stream().filter(r -> !newRegions.contains(r)).forEach(region ->
-                    mediator.tell(new Unsubscribe(region.getName(), self()), self())
+                    mediator.tell(new DistributedPubSubMediator.Unsubscribe(region.getName(), self()), self())
             );
 
             regions = newRegions;
@@ -87,7 +91,7 @@ public class PositionSubscriber extends UntypedActor {
 
         } else if (msg == TICK) {
             if (!updates.isEmpty()) {
-                subscriber.tell(new PositionSubscriberUpdate(currentArea, updates.values()), self());
+                subscriber.tell(new PositionSubscriberProtocol.PositionSubscriberUpdate(currentArea, updates.values()), self());
                 updates.clear();
             }
         }

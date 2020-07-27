@@ -1,8 +1,12 @@
-package actors;
+package com.example.actors;
 
-import akka.actor.*;
-import models.backend.*;
-import models.backend.PointOfInterest.UserPosition;
+import akka.actor.ActorRef;
+import akka.actor.Cancellable;
+import akka.actor.Props;
+import akka.actor.UntypedAbstractActor;
+import com.example.models.backend.BoundingBox;
+import com.example.models.backend.LatLng;
+import com.example.models.backend.PointOfInterest.UserPosition;
 import org.geojson.LineString;
 import org.geojson.LngLatAlt;
 import scala.concurrent.duration.Duration;
@@ -13,7 +17,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * A bot that walks back and forth along a GeoJSON LineString.
  */
-public class GeoJsonBot extends UntypedActor {
+public class GeoJsonBot extends UntypedAbstractActor {
 
     public static Props props(LineString trail, double offsetLat, double offsetLng, String userId, ActorRef regionManagerClient) {
         return Props.create(GeoJsonBot.class, () -> new GeoJsonBot(trail, offsetLat, offsetLng, userId, regionManagerClient));

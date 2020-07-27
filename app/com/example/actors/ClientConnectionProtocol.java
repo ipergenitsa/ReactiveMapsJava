@@ -1,4 +1,4 @@
-package actors;
+package com.example.actors;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;

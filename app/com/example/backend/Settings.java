@@ -1,6 +1,8 @@
-package backend;
+package com.example.backend;
 
-import akka.actor.*;
+import akka.actor.AbstractExtensionId;
+import akka.actor.ExtendedActorSystem;
+import akka.actor.ExtensionIdProvider;
 
 /**
  * The settings for this application.

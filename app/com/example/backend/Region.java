@@ -1,13 +1,17 @@
-package backend;
+package com.example.backend;
 
-import akka.actor.*;
-import akka.contrib.pattern.DistributedPubSubExtension;
-import akka.contrib.pattern.DistributedPubSubMediator.Publish;
-import scala.concurrent.duration.Deadline;
-import models.backend.*;
-import models.backend.PointOfInterest.*;
-
+import akka.actor.ActorRef;
+import akka.actor.Cancellable;
+import akka.actor.Props;
+import akka.actor.UntypedAbstractActor;
+import akka.cluster.pubsub.DistributedPubSub;
+import akka.cluster.pubsub.DistributedPubSubMediator;
+import com.example.models.backend.BoundingBox;
+import com.example.models.backend.PointOfInterest.UserPosition;
+import com.example.models.backend.RegionId;
+import com.example.models.backend.RegionPoints;
 import play.libs.F.Tuple;
+import scala.concurrent.duration.Deadline;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -18,7 +22,7 @@ import java.util.stream.Collectors;
  * These sit at the lowest level, and hold all the users in that region, and publish their summaries up.
  * User position updates are published to subscribers of the topic with the region id.
  */
-public class Region extends UntypedActor {
+public class Region extends UntypedAbstractActor {
 
     public static Props props(RegionId regionId) {
         return Props.create(Region.class, () -> new Region(regionId));
@@ -26,7 +30,7 @@ public class Region extends UntypedActor {
 
     private static final Object TICK = new Object();
 
-    private final ActorRef mediator = DistributedPubSubExtension.get(getContext().system()).mediator();
+    private final ActorRef mediator = DistributedPubSub.get(getContext().system()).mediator();
     private final SettingsImpl settings = Settings.SettingsProvider.get(getContext().system());
 
     private final RegionId regionId;
@@ -58,7 +62,7 @@ public class Region extends UntypedActor {
 
             activeUsers.put(pos.getId(), new Tuple<>(pos, Deadline.now().$plus(settings.ExpiryInterval)));
             // publish new user position to subscribers
-            mediator.tell(new Publish(regionId.getName(), pos), self());
+            mediator.tell(new DistributedPubSubMediator.Publish(regionId.getName(), pos), self());
 
         } else if (msg == TICK) {
             // expire inactive users

@@ -1,8 +1,11 @@
-package backend;
+package com.example.backend;
 
-import actors.GeoJsonBot;
-import akka.actor.*;
+import akka.actor.ActorRef;
+import akka.actor.Cancellable;
+import akka.actor.Props;
+import akka.actor.UntypedAbstractActor;
 import akka.cluster.Cluster;
+import com.example.actors.GeoJsonBot;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.geojson.Feature;
 import org.geojson.FeatureCollection;
@@ -21,7 +24,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * Loads and starts GeoJSON bots
  */
-public class BotManager extends UntypedActor {
+public class BotManager extends UntypedAbstractActor {
     public static Props props(ActorRef regionManagerClient, List<URL> data) {
         return Props.create(BotManager.class, () -> new BotManager(regionManagerClient, data));
     }

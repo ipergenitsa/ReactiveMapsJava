@@ -1,4 +1,4 @@
-package models.backend;
+package com.example.models.backend;
 
 import org.geojson.LngLatAlt;
 

@@ -1,10 +1,17 @@
-package actors;
+package com.example.actors;
 
-import akka.actor.*;
-import actors.PositionSubscriberProtocol.PositionSubscriberUpdate;
+import akka.actor.ActorRef;
+import akka.actor.Props;
+import akka.actor.UntypedAbstractActor;
+import com.example.actors.ClientConnectionProtocol.ClientEvent;
+import com.example.actors.ClientConnectionProtocol.UserMoved;
+import com.example.actors.ClientConnectionProtocol.UserPositions;
+import com.example.actors.ClientConnectionProtocol.ViewingArea;
+import com.example.actors.PositionSubscriberProtocol.PositionSubscriberUpdate;
+import com.example.models.backend.BoundingBox;
+import com.example.models.backend.LatLng;
+import com.example.models.backend.PointOfInterest;
 import com.fasterxml.jackson.databind.JsonNode;
-import models.backend.*;
-import actors.ClientConnectionProtocol.*;
 import org.geojson.Feature;
 import org.geojson.FeatureCollection;
 import org.geojson.Point;
@@ -15,7 +22,7 @@ import java.util.stream.Collectors;
 /**
  * Represents a client connection
  */
-public class ClientConnection extends UntypedActor {
+public class ClientConnection extends UntypedAbstractActor {
 
     /**
      * @param email               The email address of the client

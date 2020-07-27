@@ -1,9 +1,11 @@
-package backend;
+package com.example.backend;
 
+import com.example.models.backend.BoundingBox;
+import com.example.models.backend.LatLng;
+import com.example.models.backend.PointOfInterest;
+import com.example.models.backend.PointOfInterest.Cluster;
+import com.example.models.backend.RegionId;
 import com.google.common.collect.ImmutableSet;
-import models.backend.*;
-import models.backend.PointOfInterest.*;
-import org.geojson.LngLatAlt;
 import play.libs.F;
 
 import java.util.*;

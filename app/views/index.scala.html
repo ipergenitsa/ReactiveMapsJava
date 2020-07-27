@@ -1,7 +1,6 @@
-@()
+@(request: play.mvc.Http.Request)
 
-@main {
-
+@main(request) {
     <div class="container">
         <nav class="navbar navbar-default" role="navigation">
             <div class="navbar-header">
@@ -41,4 +40,4 @@
             </div>
         </div>
     </div>
-}
+})

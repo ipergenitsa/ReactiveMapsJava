@@ -1,14 +1,13 @@
-package backend;
+package com.example.backend;
 
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
-import actors.RegionManagerClient;
+import akka.cluster.Cluster;
+import com.example.actors.RegionManagerClient;
 
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-
-import akka.cluster.Cluster;
 
 /**
  * Main class for starting a backend node.
@@ -27,7 +26,7 @@ public class Main {
     public static void main(String... args) {
         ActorSystem system = ActorSystem.create("application");
 
-        if (Cluster.get(system).getSelfRoles().stream().anyMatch(r -> r.startsWith("backend"))) {
+        if (Cluster.get(system).getSelfRoles().stream().anyMatch(r -> r.startsWith("com/example/backend"))) {
             system.actorOf(RegionManager.props(), "regionManager");
         }
 
