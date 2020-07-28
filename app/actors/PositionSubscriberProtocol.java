@@ -1,8 +1,8 @@
-package com.example.actors;
+package actors;
 
+import backend.BoundingBox;
+import backend.PointOfInterest;
 import com.google.common.collect.ImmutableList;
-import com.example.models.backend.BoundingBox;
-import com.example.models.backend.PointOfInterest;
 
 import java.util.Collection;
 import java.util.Optional;

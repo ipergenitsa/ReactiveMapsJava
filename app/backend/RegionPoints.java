@@ -1,4 +1,4 @@
-package com.example.models.backend;
+package backend;
 
 import com.google.common.collect.ImmutableList;
 

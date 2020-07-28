@@ -1,4 +1,4 @@
-package com.example.models.backend;
+package backend;
 
 /**
  * A region id.

@@ -1,14 +1,13 @@
-package com.example.backend;
+package backend;
 
-import com.example.models.backend.BoundingBox;
-import com.example.models.backend.LatLng;
-import com.example.models.backend.PointOfInterest;
-import com.example.models.backend.PointOfInterest.Cluster;
-import com.example.models.backend.RegionId;
 import com.google.common.collect.ImmutableSet;
 import play.libs.F;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -135,9 +134,9 @@ public class GeoFunctions {
               // Map to a tuple of the lat/long/count representing the point, then reduce to the totals of these
               F.Tuple3<Double, Double, Integer> result = cluster._2.stream().map(point -> {
                   int count = 1;
-                  if (point instanceof Cluster) {
+                  if (point instanceof PointOfInterest.Cluster) {
                       // A cluster should have its lat/lng weighted by its count
-                      count = ((Cluster) point).getCount();
+                      count = ((PointOfInterest.Cluster) point).getCount();
                   }
                   // Normalise to a 0-360 based version of longitude
                   double normalisedWest = modPositive(point.getPosition().getLng() + 180, 360);
@@ -147,7 +146,7 @@ public class GeoFunctions {
 
               // Compute averages
               int count = result._3;
-              return new Cluster(id + "-" + cluster._1, System.currentTimeMillis(),
+              return new PointOfInterest.Cluster(id + "-" + cluster._1, System.currentTimeMillis(),
                       new LatLng(result._1 / count, (result._2 / count) - 180), count);
           }
       }).collect(Collectors.toList());

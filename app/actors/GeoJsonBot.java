@@ -1,12 +1,12 @@
-package com.example.actors;
+package actors;
 
 import akka.actor.ActorRef;
 import akka.actor.Cancellable;
 import akka.actor.Props;
 import akka.actor.UntypedAbstractActor;
-import com.example.models.backend.BoundingBox;
-import com.example.models.backend.LatLng;
-import com.example.models.backend.PointOfInterest.UserPosition;
+import backend.BoundingBox;
+import backend.LatLng;
+import backend.PointOfInterest;
 import org.geojson.LineString;
 import org.geojson.LngLatAlt;
 import scala.concurrent.duration.Duration;
@@ -62,7 +62,7 @@ public class GeoJsonBot extends UntypedAbstractActor {
             pos += direction;
 
             LngLatAlt c = trail.getCoordinates().get(pos);
-            UserPosition userPos = new UserPosition(userId, System.currentTimeMillis(),
+            PointOfInterest.UserPosition userPos = new PointOfInterest.UserPosition(userId, System.currentTimeMillis(),
                     new LatLng(c.getLatitude() + offsetLat, c.getLongitude() + offsetLng));
             regionManagerClient.tell(userPos, self());
 

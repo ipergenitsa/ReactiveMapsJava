@@ -1,11 +1,11 @@
-package com.example.backend;
+package backend;
 
+import actors.GeoJsonBot;
 import akka.actor.ActorRef;
 import akka.actor.Cancellable;
 import akka.actor.Props;
 import akka.actor.UntypedAbstractActor;
 import akka.cluster.Cluster;
-import com.example.actors.GeoJsonBot;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.geojson.Feature;
 import org.geojson.FeatureCollection;

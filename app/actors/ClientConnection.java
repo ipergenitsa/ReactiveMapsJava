@@ -1,17 +1,13 @@
-package com.example.actors;
+package actors;
 
 import akka.actor.ActorRef;
 import akka.actor.Props;
 import akka.actor.UntypedAbstractActor;
-import com.example.actors.ClientConnectionProtocol.ClientEvent;
-import com.example.actors.ClientConnectionProtocol.UserMoved;
-import com.example.actors.ClientConnectionProtocol.UserPositions;
-import com.example.actors.ClientConnectionProtocol.ViewingArea;
-import com.example.actors.PositionSubscriberProtocol.PositionSubscriberUpdate;
-import com.example.models.backend.BoundingBox;
-import com.example.models.backend.LatLng;
-import com.example.models.backend.PointOfInterest;
+import backend.BoundingBox;
+import backend.LatLng;
+import backend.PointOfInterest;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.geojson.Feature;
 import org.geojson.FeatureCollection;
 import org.geojson.Point;
@@ -48,20 +44,21 @@ public class ClientConnection extends UntypedAbstractActor {
 
     public void onReceive(Object msg) throws Exception {
         if (msg instanceof JsonNode) {
-            ClientEvent event = Json.fromJson((JsonNode) msg, ClientEvent.class);
+            System.out.println("Got json " + msg);
+            ClientConnectionProtocol.ClientEvent event = Json.fromJson((JsonNode) msg, ClientConnectionProtocol.ClientEvent.class);
 
-            if (event instanceof UserMoved) {
-                UserMoved userMoved = (UserMoved) event;
+            if (event instanceof ClientConnectionProtocol.UserMoved) {
+                ClientConnectionProtocol.UserMoved userMoved = (ClientConnectionProtocol.UserMoved) event;
                 regionManagerClient.tell(new PointOfInterest.UserPosition(email, System.currentTimeMillis(),
                         LatLng.fromLngLatAlt(userMoved.getPosition().getCoordinates())), self());
-            } else if (event instanceof ViewingArea) {
-                ViewingArea viewingArea = (ViewingArea) event;
+            } else if (event instanceof ClientConnectionProtocol.ViewingArea) {
+                ClientConnectionProtocol.ViewingArea viewingArea = (ClientConnectionProtocol.ViewingArea) event;
                 subscriber.tell(BoundingBox.fromBbox(viewingArea.getArea().getBbox()), self());
             }
 
-        } else if (msg instanceof PositionSubscriberUpdate) {
-
-            PositionSubscriberUpdate update = (PositionSubscriberUpdate) msg;
+        } else if (msg instanceof PositionSubscriberProtocol.PositionSubscriberUpdate) {
+            System.out.println("Got position subscriber update");
+            PositionSubscriberProtocol.PositionSubscriberUpdate update = (PositionSubscriberProtocol.PositionSubscriberUpdate) msg;
             FeatureCollection collection = new FeatureCollection();
 
             collection.setFeatures(update.getUpdates().stream().map(pos -> {
@@ -82,7 +79,9 @@ public class ClientConnection extends UntypedAbstractActor {
 
             update.getArea().ifPresent(bbox -> collection.setBbox(bbox.toBbox()));
 
-            upstream.tell(Json.toJson(new UserPositions(collection)), self());
+            JsonNode j = new ObjectMapper().valueToTree(new ClientConnectionProtocol.UserPositions(collection));
+            System.out.println("sending back " + j);
+            upstream.tell(j, self());
         }
     }
 }

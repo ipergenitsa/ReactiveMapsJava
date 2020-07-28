@@ -1,13 +1,9 @@
-package com.example.backend;
+package backend;
 
 import akka.actor.ActorRef;
 import akka.actor.Props;
 import akka.actor.UntypedAbstractActor;
 import akka.routing.FromConfig;
-import com.example.backend.RegionManagerProtocol.UpdateRegionPoints;
-import com.example.backend.RegionManagerProtocol.UpdateUserPosition;
-import com.example.models.backend.RegionId;
-import com.example.models.backend.RegionPoints;
 import scala.Option;
 
 import java.util.function.Function;
@@ -29,15 +25,15 @@ public class RegionManager extends UntypedAbstractActor {
 
 
     public void onReceive(Object msg) throws Exception {
-        if (msg instanceof UpdateUserPosition) {
-            UpdateUserPosition update = (UpdateUserPosition) msg;
+        if (msg instanceof RegionManagerProtocol.UpdateUserPosition) {
+            RegionManagerProtocol.UpdateUserPosition update = (RegionManagerProtocol.UpdateUserPosition) msg;
 
             ActorRef region = getRegionActor(update.getRegionId(), Region::props);
 
             region.tell(update.getUserPosition(), self());
 
-        } else if (msg instanceof UpdateRegionPoints) {
-            UpdateRegionPoints update = (UpdateRegionPoints) msg;
+        } else if (msg instanceof RegionManagerProtocol.UpdateRegionPoints) {
+            RegionManagerProtocol.UpdateRegionPoints update = (RegionManagerProtocol.UpdateRegionPoints) msg;
 
             ActorRef region = getRegionActor(update.getRegionId(), SummaryRegion::props);
 
@@ -48,7 +44,7 @@ public class RegionManager extends UntypedAbstractActor {
 
             // count reported by child region, propagate it to summary region on responsible node
             settings.GeoFunctions.summaryRegionForRegion(points.getRegionId()).ifPresent(summaryRegionId ->
-                    regionManagerRouter.tell(new UpdateRegionPoints(summaryRegionId, points), self())
+                    regionManagerRouter.tell(new RegionManagerProtocol.UpdateRegionPoints(summaryRegionId, points), self())
             );
         }
     }

@@ -1,4 +1,4 @@
-package com.example.actors;
+package actors;
 
 import akka.actor.ActorRef;
 import akka.actor.Cancellable;
@@ -6,13 +6,12 @@ import akka.actor.Props;
 import akka.actor.UntypedAbstractActor;
 import akka.cluster.pubsub.DistributedPubSub;
 import akka.cluster.pubsub.DistributedPubSubMediator;
-import com.example.backend.Settings;
-import com.example.backend.SettingsImpl;
-import com.example.models.backend.BoundingBox;
-import com.example.models.backend.PointOfInterest;
-import com.example.models.backend.PointOfInterest.UserPosition;
-import com.example.models.backend.RegionId;
-import com.example.models.backend.RegionPoints;
+import backend.BoundingBox;
+import backend.PointOfInterest;
+import backend.RegionId;
+import backend.RegionPoints;
+import backend.Settings;
+import backend.SettingsImpl;
 import com.google.common.collect.ImmutableSet;
 
 import java.util.HashMap;
@@ -79,8 +78,8 @@ public class PositionSubscriber extends UntypedAbstractActor {
             regions = newRegions;
             currentArea = Optional.of(bbox);
 
-        } else if (msg instanceof UserPosition) {
-            UserPosition pos = (UserPosition) msg;
+        } else if (msg instanceof PointOfInterest.UserPosition) {
+            PointOfInterest.UserPosition pos = (PointOfInterest.UserPosition) msg;
             updates.put(pos.getId(), pos);
 
         } else if (msg instanceof RegionPoints) {

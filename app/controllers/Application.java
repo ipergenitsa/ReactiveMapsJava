@@ -1,15 +1,17 @@
 package controllers;
 
+import actors.ClientConnection;
+import actors.RegionManagerClient;
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import akka.cluster.Cluster;
 import akka.stream.Materializer;
 import akka.stream.javadsl.Flow;
-import com.example.actors.ClientConnection;
-import com.example.actors.RegionManagerClient;
-import com.example.backend.BotManager;
-import com.example.backend.RegionManager;
-import com.example.backend.Settings;
+import akka.stream.javadsl.Sink;
+import akka.stream.javadsl.Source;
+import backend.BotManager;
+import backend.RegionManager;
+import backend.Settings;
 import com.fasterxml.jackson.databind.JsonNode;
 import play.Environment;
 import play.libs.streams.ActorFlow;
@@ -37,7 +39,7 @@ public class Application extends Controller {
 
     regionManagerClient = actorSystem.actorOf(RegionManagerClient.props(), "regionManagerClient");
 
-    if (Cluster.get(actorSystem).getSelfRoles().stream().anyMatch(r -> r.startsWith("com/example/backend"))) {
+    if (Cluster.get(actorSystem).getSelfRoles().stream().anyMatch(r -> r.startsWith("backend"))) {
       actorSystem.actorOf(RegionManager.props(), "regionManager");
     }
 
@@ -65,7 +67,15 @@ public class Application extends Controller {
    * The WebSocket
    */
   public WebSocket stream(String email) {
-      return WebSocket.Json.accept(upstream -> createFlowForActor(email));
+      return WebSocket.Text.accept(upstream -> {
+        // Log events to the console
+        Sink<String, ?> in = Sink.foreach(System.out::println);
+
+        // Send a single 'Hello!' message and then leave the socket open
+        Source<String, ?> out = Source.single("Hello!").concat(Source.maybe());
+
+        return Flow.fromSinkAndSource(in, out);
+      });
   }
 
   private Flow<JsonNode, JsonNode, ?> createFlowForActor(String email) {
